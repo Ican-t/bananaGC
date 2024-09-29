@@ -176,6 +176,11 @@ html, body {
     
 }
 
+#chatSelect{
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
 #loginInfo{
     display: none;
     height: 60px;
