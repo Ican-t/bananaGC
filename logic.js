@@ -7,6 +7,11 @@ const chatEnter = document.querySelector(".enterBtn")
 const lgnPage = document.getElementById("lgnPage")
 const msgPage = document.getElementById("msgPage")
 const topBar = document.getElementById("topBar")
+const infoBar = document.getElementById("loginInfo")
+const infoName = document.getElementById("name")
+const logOutBtn = document.getElementById('logOut')
+const settingsBtn = document.getElementById('settingsBtn')
+
 
 let fileToken = null
 const msgContainer = document.getElementById("messages")
@@ -22,6 +27,9 @@ let currentGrp = ""
 if (pb.authStore.isValid){
     lgnPage.classList.remove("current")
     msgPage.classList.add("current")
+
+    infoBar.style.display = "flex"
+    infoName.innerHTML = pb.authStore.model.username
 
     getGrps()
 }
@@ -74,7 +82,7 @@ function pendingMessage(msgData){
     msg.append(msgSender)
     msg.append(msgTxt)
     msgContainer.insertBefore(msg, msgContainer.firstChild)
-
+    msgContainer.scrollTo(0, msgContainer.scrollHeight)
     return msg
 }
 
@@ -104,11 +112,20 @@ function createMsg(msgData, isNew){
     msg.append(msgSender)
     msg.append(msgTxt)
 
+    
     if (isNew){
-        msgContainer.insertBefore(msg, msgContainer.firstChild)
+
+        if (msgContainer.scrollTop >= -40){
+            msgContainer.insertBefore(msg, msgContainer.firstChild)
+            msgContainer.scrollTo(0, msgContainer.scrollHeight)
+        }
+        
+        
     } else if(!isNew){
         msgContainer.append(msg)
     }
+
+    
     
 }
 
@@ -245,7 +262,8 @@ loginbtn.addEventListener('click', () => {
 
                 lgnPage.classList.remove("current")
                 msgPage.classList.add("current")
-                
+                infoBar.style.display = "flex"
+                infoName.innerHTML = pb.authStore.model.username
                 
                 getGrps()
             }
@@ -271,4 +289,13 @@ document.addEventListener('keypress', (event)=> {
         }
         chatInput.value = ""
     }
+})
+
+msgContainer.addEventListener('scrollend', ()=>{
+    console.log(msgContainer.scrollTop)
+})
+
+logOutBtn.addEventListener('click', ()=>{
+    pb.authStore.clear()
+    location.reload()
 })

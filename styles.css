@@ -165,11 +165,27 @@ html, body {
     
 }
 
-#chatSelect{
+#leftPane{
+    display: flex;
+    flex-direction: column;
     max-width: 350px;
     min-width: 200px;
     width: 30%;
     background-color: rgb(67, 67, 67);
+    justify-content: space-between;
+    
+}
+
+#loginInfo{
+    display: none;
+    height: 60px;
+    align-items: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    color: white;
+    justify-content: space-between;
+    font-size: x-large;
+    
 }
 
 .groupItem{
@@ -254,3 +270,4 @@ html, body {
     width: 40px;
     height: 40px;
 }
+
