@@ -228,19 +228,34 @@ html, body {
 .sender{
     
     width: fit-content;
-    
     padding: 2px;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    padding-bottom: 10px;
 }
 
 .txt{
     background-color: dodgerblue;
     padding: 5px;
+    
 }
 
 .mine{
     align-items: flex-end;
     align-self: flex-end;
 }
+
+.mine > .sender{
+    flex-direction: row-reverse;
+}
+
+.mine .msgPfp {
+    padding-left: 5px;
+    padding-right: 0;
+}
+
+
 
 .iconPlaceHolder{
     margin-left: 10px;
@@ -276,3 +291,9 @@ html, body {
     height: 40px;
 }
 
+.msgPfp{
+    width: 30px;
+    height: 30px;
+    padding-right: 10px;
+    
+}

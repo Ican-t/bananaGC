@@ -64,6 +64,11 @@ function pendingMessage(msgData){
     let msgIcon = document.createElement("img")
     let mgsName = document.createElement("div")
     let msgTxt = document.createElement("div")
+
+    msgIcon.classList.add("msgPfp")
+    let url = pb.files.getUrl(pb.authStore.model, pb.authStore.model.avatar, {token: fileToken})
+
+    msgIcon.src = url
             
 
     msg.classList.add("msg")
@@ -98,6 +103,7 @@ function createMsg(msgData, isNew){
     msg.classList.add("msg")
     msgTxt.classList.add("txt")
     msgSender.classList.add("sender")
+    msgIcon.classList.add("msgPfp")
 
     if (msgData.sender == pb.authStore.model.id){
         msg.classList.add("mine")
@@ -106,6 +112,12 @@ function createMsg(msgData, isNew){
 
     msgTxt.innerHTML = msgData.msg
     mgsName = msgData.expand.sender.username
+    
+
+    let url = pb.files.getUrl(msgData.expand.sender, msgData.expand.sender.avatar, {token: fileToken})
+
+    msgIcon.src = url
+
 
     msgSender.append(msgIcon)
     msgSender.append(mgsName)
