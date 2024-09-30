@@ -303,9 +303,12 @@ pb.collection('messages').subscribe('*', (msgData) => {
     }
 
     if (Notification.permission === "granted"){
-        new Notification("New message from: " + msgData.record.expand.sender.username, {
-            body: msgData.record.msg
-        })
+        if(currentGrp != msgData.record.group || Document.hidden){
+            new Notification("New message from: " + msgData.record.expand.sender.username, {
+                body: msgData.record.msg
+            })
+        }
+        
     }
     
     console.log(msgData.record)
