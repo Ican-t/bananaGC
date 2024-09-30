@@ -276,6 +276,20 @@ loginbtn.addEventListener('click', () => {
                 msgPage.classList.add("current")
                 infoBar.style.display = "flex"
                 infoName.innerHTML = pb.authStore.model.username
+
+                if (Notification.permission === "default"){
+                    Notification.requestPermission().then((perm)=>{
+                        if (perm === "granted"){
+                            new Notification("You will now recieve notifications", {
+                                body: "You can turn this off anytime in settings"
+                            })
+                        }
+                        
+                    })
+                    
+                }
+
+                
                 
                 getGrps()
             }
