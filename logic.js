@@ -302,9 +302,12 @@ pb.collection('messages').subscribe('*', (msgData) => {
         return
     }
 
-    new Notification("New message from: " + msgData.record.expand.sender.username, {
-        body: msgData.record.msg
-    })
+    if (Notification.permission === "granted"){
+        new Notification("New message from: " + msgData.record.expand.sender.username, {
+            body: msgData.record.msg
+        })
+    }
+    
     console.log(msgData.record)
 
     createMsg(msgData.record, true)
