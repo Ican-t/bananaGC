@@ -298,23 +298,21 @@ loginbtn.addEventListener('click', () => {
 })
 
 pb.collection('messages').subscribe('*', (msgData) => {
-    if (msgData.record.group != currentGrp || msgData.record.sender == pb.authStore.model.id){
-        return
+    if (msgData.record.group == currentGrp && msgData.record.sender != pb.authStore.model.id){
+        createMsg(msgData.record, true)
     }
 
     if (Notification.permission === "granted"){
-        if(currentGrp != msgData.record.group || Document.hidden){
-            new Notification("New message from: " + msgData.record.expand.sender.username, {
+        
+
+        if (document.hidden || (msgData.record.group != currentGrp && msgData.record.sender != pb.authStore.model.id)){
+            new Notification(msgData.record.expand.sender.username + " messaged in " + msgData.record.expand.group.name, {
                 body: msgData.record.msg
             })
-        }
+        } 
         
     }
-    
-    console.log(msgData.record)
-
-    createMsg(msgData.record, true)
-}, {"expand": "sender"})
+}, {"expand": "sender,group"})
 
 document.addEventListener('keypress', (event)=> {
     if (event.key == "Enter"){
