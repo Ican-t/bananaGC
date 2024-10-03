@@ -339,7 +339,7 @@ async function sendMSG(message){
         "msg": message,
         "reply": replyMsg
         
-    }, {requestKey: null})
+    }, {requestKey: null, expand: "sender"})
 
     msgReply = msgItem.querySelector('.replyBtn')
 
