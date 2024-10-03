@@ -13,6 +13,7 @@ const logOutBtn = document.getElementById('logOut')
 const settingsBtn = document.getElementById('settingsBtn')
 const replyPreview = document.getElementById("replyPreview")
 const cancelReply = document.getElementById("cancelReply")
+const bottomBar = document.querySelector('.bottomBar')
 
 let fileToken = null
 const msgContainer = document.getElementById("messages")
@@ -305,6 +306,7 @@ async function getGrps(){
                 currentGrp = group.id
 
                 topBar.style.display = "flex"
+                bottomBar.style.display = "flex"
 
                 if (icon == true){
                     topBar.querySelector("#placeHolderIcn").style.display = "none"
