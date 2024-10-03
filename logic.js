@@ -11,7 +11,8 @@ const infoBar = document.getElementById("loginInfo")
 const infoName = document.getElementById("name")
 const logOutBtn = document.getElementById('logOut')
 const settingsBtn = document.getElementById('settingsBtn')
-
+const replyPreview = document.getElementById("replyPreview")
+const cancelReply = document.getElementById("cancelReply")
 
 let fileToken = null
 const msgContainer = document.getElementById("messages")
@@ -22,7 +23,9 @@ const pb = new PocketBase("https://bananagc.pockethost.io/")
 
 
 
-let currentGrp = ""
+var currentGrp = ""
+var replyMsg = ""
+var replyMsgContent = {msg: "", sender: ""}
 
 if (pb.authStore.isValid){
     lgnPage.classList.remove("current")
@@ -57,6 +60,26 @@ async function login(username, pword){
     
 }
 
+cancelReply.addEventListener('click', ()=>{
+    clearReply()
+})
+
+function clearReply(){
+    replyPreview.querySelector('#replyContent').innerHTML = ""
+    replyPreview.querySelector('#replyUserName').innerHTML = ""
+    replyPreview.style.display = "none"
+    replyMsg = ""
+    replyMsgContent.msg = ""
+    replyMsgContent.sender = ""
+}
+
+function showReply(msg, name){
+    
+    replyPreview.querySelector('#replyContent').innerHTML = msg
+    replyPreview.querySelector('#replyUserName').innerHTML = "-" + name
+    replyPreview.style.display = "flex"
+}
+
 function pendingMessage(msgData){
 
     let msg = document.createElement("div")
@@ -64,17 +87,25 @@ function pendingMessage(msgData){
     let msgIcon = document.createElement("img")
     let mgsName = document.createElement("div")
     let msgTxt = document.createElement("div")
+    let replyBtn = document.createElement("div")
+    let horizontal = document.createElement("div")
+    let txtContainer = document.createElement("div")
+    let replyTxt = document.createElement("div")
 
     msgIcon.classList.add("msgPfp")
     let url = pb.files.getUrl(pb.authStore.model, pb.authStore.model.avatar, {token: fileToken})
 
     msgIcon.src = url
             
-
+    replyTxt.classList.add("replyTxt")
     msg.classList.add("msg")
     msgTxt.classList.add("txt")
     msgSender.classList.add("sender")
-    msg.style.opacity = '0.5'
+    msgTxt.style.opacity = '0.5'
+    replyBtn.classList.add("material-symbols-outlined")
+    replyBtn.classList.add("replyBtn")
+    replyBtn.innerHTML = "reply"
+    horizontal.classList.add("horizontal")
     
     msg.classList.add("mine")
             //msg.innerHTML = msgData.expand.sender.username + ": " + msgData.msg
@@ -82,10 +113,33 @@ function pendingMessage(msgData){
     msgTxt.innerHTML = msgData
     mgsName = pb.authStore.model.username
 
+    if (replyMsgContent.msg != "" || replyMsgContent.sender != ""){
+        replyTxt.innerHTML = replyMsgContent.msg + ' -' + replyMsgContent.sender
+        txtContainer.append(replyTxt)
+    }
+
+    txtContainer.append(msgTxt)
     msgSender.append(msgIcon)
     msgSender.append(mgsName)
+    horizontal.append(txtContainer)
+    horizontal.append(replyBtn)
     msg.append(msgSender)
-    msg.append(msgTxt)
+    msg.append(horizontal)
+
+    msg.addEventListener("mouseover", ()=>{
+        if(msgTxt.style.opacity == '1'){
+            replyBtn.style.visibility = "visible"
+        }
+        
+    })
+
+    msg.addEventListener("mouseleave", ()=>{
+        if(replyBtn.style.visibility == "visible"){
+            replyBtn.style.visibility = "hidden"
+        }
+        
+    })
+
     msgContainer.insertBefore(msg, msgContainer.firstChild)
     msgContainer.scrollTo(0, msgContainer.scrollHeight)
     return msg
@@ -96,14 +150,23 @@ function createMsg(msgData, isNew){
     let msg = document.createElement("div")
     let msgSender = document.createElement("div")
     let msgIcon = document.createElement("img")
-    let mgsName = document.createElement("div")
+    let msgName = document.createElement("div")
     let msgTxt = document.createElement("div")
-            
+    let replyBtn = document.createElement("div")
+    let horizontal = document.createElement("div")
+    let txtContainer = document.createElement("div")
+    let replyTxt = document.createElement("div")
 
+    
     msg.classList.add("msg")
     msgTxt.classList.add("txt")
     msgSender.classList.add("sender")
     msgIcon.classList.add("msgPfp")
+    replyBtn.classList.add("material-symbols-outlined")
+    replyBtn.classList.add("replyBtn")
+    replyBtn.innerHTML = "reply"
+    horizontal.classList.add("horizontal")
+    replyTxt.classList.add("replyTxt")
 
     if (msgData.sender == pb.authStore.model.id){
         msg.classList.add("mine")
@@ -111,18 +174,26 @@ function createMsg(msgData, isNew){
             //msg.innerHTML = msgData.expand.sender.username + ": " + msgData.msg
 
     msgTxt.innerHTML = msgData.msg
-    mgsName = msgData.expand.sender.username
+    msgName.innerHTML = msgData.expand.sender.username
     
 
     let url = pb.files.getUrl(msgData.expand.sender, msgData.expand.sender.avatar, {token: fileToken})
 
     msgIcon.src = url
 
-
+    if (msgData.expand.reply != null){
+        replyTxt.innerHTML = msgData.expand.reply.msg + ' -' + msgData.expand.reply.expand.sender.username
+        txtContainer.append(replyTxt)
+    }
+    
+    txtContainer.append(msgTxt)
     msgSender.append(msgIcon)
-    msgSender.append(mgsName)
+    msgSender.append(msgName)
+    horizontal.append(txtContainer)
+    horizontal.append(replyBtn)
     msg.append(msgSender)
-    msg.append(msgTxt)
+    msg.append(horizontal)
+    
 
     
     if (isNew){
@@ -137,7 +208,21 @@ function createMsg(msgData, isNew){
         msgContainer.append(msg)
     }
 
-    
+    msg.addEventListener("mouseover", ()=>{
+        replyBtn.style.visibility = "visible"
+    })
+
+    msg.addEventListener("mouseleave", ()=>{
+        replyBtn.style.visibility = "hidden"
+    })
+
+    replyBtn.addEventListener('click', ()=>{
+        showReply(msgData.msg, msgData.expand.sender.username)
+        replyMsg = msgData.id
+        replyMsgContent.msg = msgData.msg
+        replyMsgContent.sender = msgData.expand.sender.username
+        console.log(replyMsg)
+    })
     
 }
 
@@ -150,7 +235,7 @@ async function getMsg(grp){
     try {
         let gmsg = await pb.collection("messages").getFullList({
             filter: "group.id = '" + grp + "'",
-            expand: "sender",
+            expand: "sender,reply.sender",
             sort: "-created"
         })
 
@@ -231,7 +316,7 @@ async function getGrps(){
                 }
 
                 
-                
+                clearReply()
                 topBar.querySelector('#grpname').innerHTML = group.name
                 
             })
@@ -246,16 +331,28 @@ async function getGrps(){
 
 async function sendMSG(message){
 
-    let msgItem = pendingMessage(message)
+    var msgItem = pendingMessage(message)
 
-    await pb.collection('messages').create({
+    var msgRecord = await pb.collection('messages').create({
         "group": currentGrp,
         "sender": pb.authStore.model.id,
-        "msg": message
+        "msg": message,
+        "reply": replyMsg
         
     }, {requestKey: null})
+
+    msgReply = msgItem.querySelector('.replyBtn')
+
+    msgReply.addEventListener('click', ()=>{
+        showReply(msgRecord.msg, msgRecord.expand.sender.username)
+        replyMsg = msgRecord.id
+        replyMsgContent.msg = msgRecord.msg
+        replyMsgContent.sender = msgRecord.expand.sender.username
+        console.log(replyMsg)
+    })
     
-    msgItem.style.opacity = '1'
+    msgText = msgItem.querySelector('.txt')
+    msgText.style.opacity = '1'
     
 }
 
@@ -264,6 +361,7 @@ chatEnter.addEventListener("click", () => {
         sendMSG(chatInput.value)
     }
     chatInput.value = ""
+    clearReply()
 })
 
 loginbtn.addEventListener('click', () => {
@@ -298,6 +396,7 @@ loginbtn.addEventListener('click', () => {
 })
 
 pb.collection('messages').subscribe('*', (msgData) => {
+    
     if (msgData.record.group == currentGrp && msgData.record.sender != pb.authStore.model.id){
         createMsg(msgData.record, true)
     }
@@ -312,7 +411,7 @@ pb.collection('messages').subscribe('*', (msgData) => {
         } 
         
     }
-}, {"expand": "sender,group"})
+}, {"expand": "sender,group,reply.sender"})
 
 document.addEventListener('keypress', (event)=> {
     if (event.key == "Enter"){
@@ -320,6 +419,7 @@ document.addEventListener('keypress', (event)=> {
             sendMSG(chatInput.value)
         }
         chatInput.value = ""
+        clearReply()
     }
 })
 

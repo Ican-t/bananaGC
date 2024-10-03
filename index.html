@@ -61,12 +61,26 @@
           <div id="placeholder">Select a chat</div>
         </div>
 
-        <div class="bottomBar">
-          <input type="text" class="chatBar">
-          <div class="material-symbols-outlined enterBtn">
-            send
+        <div>
+          <div id="replyPreview">
+            <div style="display: flex; flex-direction: column; flex: 1;">
+              <div style="padding-bottom: 10px; font-size: small;">Replying</div>
+              <div id="replyContent"></div>
+              <div id="replyUserName"></div>
+            </div>
+            <div class="material-symbols-outlined" id="cancelReply" style="cursor: pointer;">
+              close
+            </div>
+          </div>
+          <div class="bottomBar">
+            <input type="text" class="chatBar">
+            <div class="material-symbols-outlined enterBtn">
+              send
+            </div>
           </div>
         </div>
+        
+        
 
       
 

@@ -74,7 +74,7 @@ html, body {
     flex: 1 1 auto;
     
     flex-direction: column-reverse;
-    padding-bottom: 15px;
+    padding-bottom: 5px;
     overflow-y: auto;
     
     
@@ -216,28 +216,30 @@ html, body {
 .msg{
     color: white;
     width: fit-content;
-    margin: 0px 10px;
-    padding: 5px;
+    margin: 0px 15px;
+    padding-top: 15px;
+    padding-bottom: 15px;
     display: flex;
     flex-direction: column;
     max-width: 400px;
     word-break: break-word;
+    
     
 }
 
 .sender{
     
     width: fit-content;
-    padding: 2px;
     display: flex;
     align-items: center;
-    padding: 5px;
-    padding-bottom: 10px;
+    padding-bottom: 5px;
+    
 }
 
 .txt{
     background-color: dodgerblue;
     padding: 5px;
+    min-width: 55px;
     
 }
 
@@ -247,6 +249,10 @@ html, body {
 }
 
 .mine > .sender{
+    flex-direction: row-reverse;
+}
+
+.mine > .horizontal{
     flex-direction: row-reverse;
 }
 
@@ -296,4 +302,51 @@ html, body {
     height: 30px;
     padding-right: 10px;
     
+}
+
+.horizontal{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.replyBtn{
+    padding: 0 10px;
+    cursor: pointer;
+    visibility: hidden;
+}
+
+#replyPreview{
+    display: none;
+    color: white;
+    overflow: hidden;
+    padding: 10px;
+    background-color: rgb(151, 151, 151);
+    justify-content: space-between;
+    font-size: medium;
+    
+}
+
+#replyContent::-webkit-scrollbar{
+    display: none;
+}
+
+#replyContent{
+    font-size: large;
+    width: fit-content;
+    min-width: 100%;
+    max-width: min-content;
+    -ms-overflow-style: none;  
+    scrollbar-width: none;
+    overflow-y: auto;
+    height: fit-content;
+    max-height: 70px;
+    
+}
+
+.replyTxt{
+    display: flex;
+    padding: 10px;
+    background-color: rgb(18, 18, 18);
+    opacity: 0.8;
 }
