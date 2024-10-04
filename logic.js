@@ -53,10 +53,6 @@ async function login(username, pword){
             username,
             pword,
         )
-    
-        console.log(pb.authStore.isValid)
-        console.log(pb.authStore.token)
-        console.log(pb.authStore.model.id)
 
     } catch (e){
         console.error(e)
@@ -227,7 +223,7 @@ function createMsg(msgData, isNew){
         replyMsg = msgData.id
         replyMsgContent.msg = msgData.msg
         replyMsgContent.sender = msgData.expand.sender.username
-        console.log(replyMsg)
+        
     })
     
 }
@@ -245,7 +241,7 @@ async function getMsg(grp){
             sort: "-created"
         })
 
-        console.log(gmsg)
+       
 
         gmsg.forEach((msgData) =>{
             createMsg(msgData, false)
@@ -287,7 +283,7 @@ async function getGrps(){
 
             
             let url = pb.files.getUrl(group, group.icon, {'token': fileToken})
-            console.log(url)
+            
             if (url != ''){
                 grpIcon.src = url
                 grpItem.append(grpIcon)
@@ -307,7 +303,7 @@ async function getGrps(){
 
             grpItem.addEventListener("click", () => {
                 getMsg(group.id)
-                console.log(group.name)
+                
                 currentGrp = group.id
 
                 topBar.style.display = "flex"
@@ -355,7 +351,7 @@ async function sendMSG(message){
         replyMsg = msgRecord.id
         replyMsgContent.msg = msgRecord.msg
         replyMsgContent.sender = msgRecord.expand.sender.username
-        console.log(replyMsg)
+        
     })
     
     msgText = msgItem.querySelector('.txt')
@@ -375,7 +371,7 @@ loginbtn.addEventListener('click', () => {
     if (emailName.value.trim().length != 0 && password.value.trim().length != 0) {
         login(emailName.value, password.value).then((loggedIn) => {
             if (loggedIn){
-                console.log("logged in baby")
+                
 
                 lgnPage.classList.remove("current")
                 msgPage.classList.add("current")
@@ -428,10 +424,6 @@ document.addEventListener('keypress', (event)=> {
         chatInput.value = ""
         clearReply()
     }
-})
-
-msgContainer.addEventListener('scrollend', ()=>{
-    console.log(msgContainer.scrollTop)
 })
 
 logOutBtn.addEventListener('click', ()=>{
