@@ -350,3 +350,11 @@ html, body {
     background-color: rgb(18, 18, 18);
     opacity: 0.8;
 }
+
+#loginUI{
+    display: flex;
+}
+
+#loginUI > div{
+    padding: 5px;
+}

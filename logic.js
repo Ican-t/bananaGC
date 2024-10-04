@@ -28,16 +28,21 @@ var currentGrp = ""
 var replyMsg = ""
 var replyMsgContent = {msg: "", sender: ""}
 
-if (pb.authStore.isValid){
-    lgnPage.classList.remove("current")
-    msgPage.classList.add("current")
+async function startApp(){
 
-    infoBar.style.display = "flex"
-    infoName.innerHTML = pb.authStore.model.username
+    if (pb.authStore.isValid){
+        lgnPage.classList.remove("current")
+        await pb.collection('users').authRefresh()
+        
+        msgPage.classList.add("current")
 
-    getGrps()
+        infoBar.style.display = "flex"
+        infoName.innerHTML = pb.authStore.model.username
+
+        getGrps()
+    }
+
 }
-
 
 
 
@@ -433,3 +438,5 @@ logOutBtn.addEventListener('click', ()=>{
     pb.authStore.clear()
     location.reload()
 })
+
+startApp()
