@@ -14,6 +14,8 @@ const settingsBtn = document.getElementById('settingsBtn')
 const replyPreview = document.getElementById("replyPreview")
 const cancelReply = document.getElementById("cancelReply")
 const bottomBar = document.querySelector('.bottomBar')
+const backBtn = document.getElementById('backToGrps')
+var screenWidth = window.matchMedia("(max-width: 500px)")
 
 let fileToken = null
 const msgContainer = document.getElementById("messages")
@@ -318,7 +320,10 @@ async function getGrps(){
                     topBar.querySelector("#placeHolderIcn").style.display = "flex"
                 }
 
-                
+                if (screenWidth.matches){
+                    document.getElementById('chat').style.left = '-100vw'
+                    document.getElementById('leftPane').style.left = '-30vw'
+                }
                 clearReply()
                 topBar.querySelector('#grpname').innerHTML = group.name
                 
@@ -429,6 +434,13 @@ document.addEventListener('keypress', (event)=> {
 logOutBtn.addEventListener('click', ()=>{
     pb.authStore.clear()
     location.reload()
+})
+
+backBtn.addEventListener('click', ()=>{
+    if (screenWidth.matches){
+        document.getElementById('chat').style.left = '0'
+        document.getElementById('leftPane').style.left = '0'
+    }
 })
 
 startApp()
