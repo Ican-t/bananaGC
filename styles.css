@@ -363,6 +363,10 @@ html, body {
     display: none;
 }
 
+#spacer{
+    display: none;
+}
+
 @media all and (max-width: 500px) {
     #chat{
         width: 100vw;
@@ -427,7 +431,9 @@ html, body {
         cursor: pointer;
     }
 
-    body{
-        padding-bottom: 5px;
+    #spacer{
+        display: flex;
+        min-height: 20px;
+        max-height: 20px;
     }
 }
