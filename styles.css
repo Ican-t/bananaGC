@@ -426,4 +426,8 @@ html, body {
         padding-inline: 10px;
         cursor: pointer;
     }
+
+    body{
+        padding-bottom: 5px;
+    }
 }
