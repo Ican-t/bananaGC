@@ -15,6 +15,7 @@ const replyPreview = document.getElementById("replyPreview")
 const cancelReply = document.getElementById("cancelReply")
 const bottomBar = document.querySelector('.bottomBar')
 const backBtn = document.getElementById('backToGrps')
+const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
 var screenWidth = window.matchMedia("(max-width: 500px)")
 
 let fileToken = null
@@ -29,6 +30,7 @@ const pb = new PocketBase("https://bananagc.pockethost.io/")
 var currentGrp = ""
 var replyMsg = ""
 var replyMsgContent = {msg: "", sender: ""}
+
 
 async function startApp(){
 
@@ -95,6 +97,7 @@ function pendingMessage(msgData){
     let horizontal = document.createElement("div")
     let txtContainer = document.createElement("div")
     let replyTxt = document.createElement("div")
+    let timestamp = document.createElement('div')
 
     msgIcon.classList.add("msgPfp")
     let url = pb.files.getUrl(pb.authStore.model, pb.authStore.model.avatar, {token: fileToken})
@@ -105,11 +108,14 @@ function pendingMessage(msgData){
     msg.classList.add("msg")
     msgTxt.classList.add("txt")
     msgSender.classList.add("sender")
-    msgTxt.style.opacity = '0.5'
+    horizontal.style.opacity = '0.5'
     replyBtn.classList.add("material-symbols-outlined")
     replyBtn.classList.add("replyBtn")
     replyBtn.innerHTML = "reply"
     horizontal.classList.add("horizontal")
+    timestamp.classList.add('timestamp')
+
+    timestamp.innerHTML = 'placeHolder'
     
     msg.classList.add("mine")
             //msg.innerHTML = msgData.expand.sender.username + ": " + msgData.msg
@@ -129,18 +135,20 @@ function pendingMessage(msgData){
     horizontal.append(replyBtn)
     msg.append(msgSender)
     msg.append(horizontal)
+    msg.append(timestamp)
 
     msg.addEventListener("mouseover", ()=>{
-        if(msgTxt.style.opacity == '1'){
+        if(horizontal.style.opacity == '1'){
             replyBtn.style.visibility = "visible"
+            timestamp.style.visibility = "visible"
         }
         
     })
 
     msg.addEventListener("mouseleave", ()=>{
-        if(replyBtn.style.visibility == "visible"){
-            replyBtn.style.visibility = "hidden"
-        }
+        
+        replyBtn.style.visibility = "hidden"
+        timestamp.style.visibility = "hidden"
         
     })
 
@@ -149,7 +157,9 @@ function pendingMessage(msgData){
     return msg
 }
 
-function createMsg(msgData, isNew){
+function createMsg(msgData, isNew, newDay){
+
+    newDay == null? newDay = false : newDay = newDay
 
     let msg = document.createElement("div")
     let msgSender = document.createElement("div")
@@ -160,6 +170,7 @@ function createMsg(msgData, isNew){
     let horizontal = document.createElement("div")
     let txtContainer = document.createElement("div")
     let replyTxt = document.createElement("div")
+    let timestamp = document.createElement('div')
 
     
     msg.classList.add("msg")
@@ -171,6 +182,7 @@ function createMsg(msgData, isNew){
     replyBtn.innerHTML = "reply"
     horizontal.classList.add("horizontal")
     replyTxt.classList.add("replyTxt")
+    timestamp.classList.add('timestamp')
 
     if (msgData.sender == pb.authStore.model.id){
         msg.classList.add("mine")
@@ -179,6 +191,10 @@ function createMsg(msgData, isNew){
 
     msgTxt.innerHTML = msgData.msg
     msgName.innerHTML = msgData.expand.sender.username
+    var dateSent = new Date(msgData.created)
+    var hour = dateSent.getHours() > 12? dateSent.getHours() - 12 : dateSent.getHours()
+    var minute = dateSent.getMinutes() <= 9? '0' + dateSent.getMinutes() : dateSent.getMinutes()
+    timestamp.innerHTML = hour + ':' + minute + (dateSent.getHours() >= 12? ' PM' : ' AM')
     
 
     let url = pb.files.getUrl(msgData.expand.sender, msgData.expand.sender.avatar, {token: fileToken})
@@ -197,13 +213,19 @@ function createMsg(msgData, isNew){
     horizontal.append(replyBtn)
     msg.append(msgSender)
     msg.append(horizontal)
-    
+    msg.append(timestamp)
+    msg.setAttribute('sentdate', dateSent)
 
     
     if (isNew){
 
-        if (msgContainer.scrollTop >= -40){
-            msgContainer.insertBefore(msg, msgContainer.firstChild)
+        var scrollPos = msgContainer.scrollTop
+
+        msgContainer.insertBefore(msg, msgContainer.firstElementChild)
+        
+        if (scrollPos >= -60 || newDay){
+
+            
             msgContainer.scrollTo(0, msgContainer.scrollHeight)
         }
         
@@ -214,10 +236,12 @@ function createMsg(msgData, isNew){
 
     msg.addEventListener("mouseover", ()=>{
         replyBtn.style.visibility = "visible"
+        timestamp.style.visibility = "visible"
     })
 
     msg.addEventListener("mouseleave", ()=>{
         replyBtn.style.visibility = "hidden"
+        timestamp.style.visibility = "hidden"
     })
 
     replyBtn.addEventListener('click', ()=>{
@@ -244,9 +268,27 @@ async function getMsg(grp){
         })
 
        
+        
+        gmsg.forEach((msgData, index, msgList) =>{
+            createMsg(msgData, false, )
 
-        gmsg.forEach((msgData) =>{
-            createMsg(msgData, false)
+            var thisDate = new Date(msgData.created)
+            var dateBar = document.createElement('div')
+            dateBar.innerHTML = monthNames[thisDate.getMonth()] + ' ' + thisDate.getDate()
+            dateBar.classList.add('dateBar')
+
+            if (index < msgList.length - 1){
+            
+                var nextDate = new Date(msgList[index + 1].created)
+
+                if (thisDate.getFullYear() != nextDate.getFullYear() || thisDate.getMonth() != nextDate.getMonth() || thisDate.getDate() != nextDate.getDate()){
+                    
+                    msgContainer.append(dateBar)
+                }
+
+            } else if (index == msgList.length - 1){
+                msgContainer.append(dateBar)
+            }
         })
 
         
@@ -339,6 +381,8 @@ async function getGrps(){
 
 async function sendMSG(message){
 
+    var lastMSG = msgContainer.querySelector(".msg")
+
     var msgItem = pendingMessage(message)
 
     var msgRecord = await pb.collection('messages').create({
@@ -358,9 +402,38 @@ async function sendMSG(message){
         replyMsgContent.sender = msgRecord.expand.sender.username
         
     })
+
+    var dateSent = new Date(msgRecord.created)
+    var hour = dateSent.getHours() > 12? dateSent.getHours() - 12 : dateSent.getHours()
+    var minute = dateSent.getMinutes() <= 9? '0' + dateSent.getMinutes() : dateSent.getMinutes()
+    msgItem.querySelector('.timestamp').innerHTML = hour + ':' + minute + (dateSent.getHours() >= 12? ' PM' : ' AM')
     
-    msgText = msgItem.querySelector('.txt')
+
+    var lastMSGDate = new Date(lastMSG.getAttribute("sentdate"))
+    var lastYear = lastMSGDate.getFullYear()
+    var lastMonth = lastMSGDate.getMonth()
+    var lastDay = lastMSGDate.getDate()
+
+    
+    var thisYear = dateSent.getFullYear()
+    var thisMonth = dateSent.getMonth()
+    var thisDay = dateSent.getDate()
+
+    
+
+    if (thisYear != lastYear || thisMonth != lastMonth|| thisDay != lastDay){
+        
+        var dateBar = document.createElement('div')
+        dateBar.innerHTML = monthNames[thisMonth] + ' ' + thisDay
+        dateBar.classList.add('dateBar')
+            
+        msgItem.insertAdjacentElement('afterend', dateBar)
+    }
+
+    msgItem.setAttribute('sentdate', new Date(msgRecord.created))
+    msgText = msgItem.querySelector('.horizontal')
     msgText.style.opacity = '1'
+    msgContainer.scrollTo(0, msgContainer.scrollHeight)
     
 }
 
@@ -404,9 +477,33 @@ loginbtn.addEventListener('click', () => {
 })
 
 pb.collection('messages').subscribe('*', (msgData) => {
+
     
-    if (msgData.record.group == currentGrp && msgData.record.sender != pb.authStore.model.id){
-        createMsg(msgData.record, true)
+    if (msgData.record.group == currentGrp && msgData.record.sender != pb.authStore.model.id && msgData.action == 'create'){
+
+        var lastMSGDate = new Date(msgContainer.querySelector(".msg").getAttribute("sentdate"))
+        var lastYear = lastMSGDate.getFullYear()
+        var lastMonth = lastMSGDate.getMonth()
+        var lastDay = lastMSGDate.getDate()
+
+        var thisDate = new Date(msgData.record.created)
+        var thisYear = thisDate.getFullYear()
+        var thisMonth = thisDate.getMonth()
+        var thisDay = thisDate.getDate()
+
+        var newDay = false
+
+        if (thisYear != lastYear || thisMonth != lastMonth|| thisDay != lastDay){
+            
+            var dateBar = document.createElement('div')
+            dateBar.innerHTML = monthNames[thisMonth] + ' ' + thisDay
+            dateBar.classList.add('dateBar')
+            newDay = true
+            msgContainer.insertBefore(dateBar, msgContainer.firstElementChild)
+        }
+        
+        
+        createMsg(msgData.record, true, newDay)
     }
 
     if (Notification.permission === "granted"){
@@ -442,5 +539,9 @@ backBtn.addEventListener('click', ()=>{
         document.getElementById('leftPane').style.left = '0'
     }
 })
+
+/* msgContainer.addEventListener('scrollend', ()=>{
+    console.log(msgContainer.scrollTop)
+}) */
 
 startApp()

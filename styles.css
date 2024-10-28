@@ -217,8 +217,8 @@ html, body {
     color: white;
     width: fit-content;
     margin: 0px 15px;
-    padding-top: 15px;
-    padding-bottom: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     display: flex;
     flex-direction: column;
     max-width: 400px;
@@ -261,6 +261,9 @@ html, body {
     padding-right: 0;
 }
 
+.mine > .timestamp{
+    text-align: right;
+}
 
 
 .iconPlaceHolder{
@@ -365,6 +368,22 @@ html, body {
 
 #spacer{
     display: none;
+}
+
+.timestamp{
+    display: flex;
+    visibility: hidden;
+    font-size: small;
+    margin: 0;
+    padding-top: 5px;
+}
+
+.dateBar{
+    display: flex;
+    
+    padding: 10px;
+    justify-content: center;
+    color: white;
 }
 
 @media all and (max-width: 500px) {
